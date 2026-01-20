@@ -7,7 +7,7 @@ public class Conta(string nome, string cpf)
     public string Cpf { get; private set; } = cpf;
     public bool IsAtivo { get; private set; } = true;
 
-    public void Update(string nome, bool status)
+    public void Atualizar(string nome, bool status)
     {
         Nome = nome;
         IsAtivo = status;
