@@ -30,6 +30,19 @@ public class ContaAppService(IContaRepository repository, ILogger<ContaAppServic
         }
     }
 
+    public async Task<IEnumerable<ContaDto>> ObterTodosAsync()
+    {
+        _logger.LogInformation("Buscando todas as contas para listagem.");
+
+        var contas = await _repository.ObterTodosAsync();
+
+        return contas.Select(c => new ContaDto(
+            c.Id,
+            c.Nome,
+            c.Cpf,
+            c.IsAtivo));
+    }
+
     public async Task<ContaDto?> ObterPorIdAsync(Guid id)
     {
         _logger.LogInformation("Consultando dados da conta: {Id}", id);

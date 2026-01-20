@@ -20,6 +20,11 @@ public class CachedContaRepository(IContaRepository inner, IMemoryCache cache) :
         });
     }
 
+    public async Task<IEnumerable<Conta>> ObterTodosAsync()
+    {
+        return await _inner.ObterTodosAsync();
+    }
+
     public async Task AdicionarAsync(Conta conta)
     {
         await _inner.AdicionarAsync(conta);

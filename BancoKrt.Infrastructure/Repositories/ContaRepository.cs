@@ -16,6 +16,13 @@ public class ContaRepository(AppDbContext context) : IContaRepository
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+    public async Task<IEnumerable<Conta>> ObterTodosAsync()
+    {
+        return await _context.Contas
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task AdicionarAsync(Conta conta)
     {
         await _context.Contas.AddAsync(conta);

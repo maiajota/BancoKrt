@@ -4,7 +4,6 @@ using BancoKrt.Infrastructure.Data;
 using BancoKrt.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +12,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddMemoryCache();
+builder.Services.AddControllersWithViews(); 
 
 builder.Services.AddScoped<ContaRepository>();
-
 builder.Services.AddScoped<IContaRepository>(provider =>
 {
     var repository = provider.GetRequiredService<ContaRepository>();
@@ -25,33 +24,23 @@ builder.Services.AddScoped<IContaRepository>(provider =>
 
 builder.Services.AddScoped<ContaAppService>();
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "BancoKrt API",
-        Version = "v1",
-        Description = "API de Gestão de Contas KRT"
-    });
-
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-    if (File.Exists(xmlPath))
-        c.IncludeXmlComments(xmlPath);
-});
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
+app.UseHttpsRedirection();
+
+app.UseStaticFiles(); 
+
+app.UseRouting();
 app.UseAuthorization();
-app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Contas}/{action=Index}/{id?}");
 
 app.Run();
