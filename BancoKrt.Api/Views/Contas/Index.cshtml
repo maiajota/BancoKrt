@@ -1,0 +1,78 @@
+@model IEnumerable<BancoKrt.Application.DTOs.ContaDto>
+
+@{
+    ViewData["Title"] = "Lista de Contas";
+}
+
+<div class="mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="display-6"><i class="bi bi-person-lines-fill"></i> Carteira de Clientes</h2>
+            <p class="text-muted">Gerencie as contas do BancoKRT.</p>
+        </div>
+        <div class="col-auto">
+            <a asp-controller="Contas" asp-action="Criar" class="btn btn-primary">
+                Abrir Nova Conta
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive shadow rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th class="ps-4">Cliente</th>
+                    <th>CPF</th>
+                    <th>Status</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var conta in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="fw-bold">@conta.Nome</div>
+                        </td>
+                        <td>@conta.Cpf</td>
+                        <td>
+                            @if (conta.IsAtivo)
+                            {
+                                <span class="badge bg-success-subtle text-success px-3">Ativo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger px-3">Inativo</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Atualizar" asp-route-id="@conta.Id" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+
+                                @if (conta.IsAtivo)
+                                {
+                                    <form asp-action="Desativar" asp-route-id="@conta.Id" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Deseja realmente desativar esta conta?')">
+                                            <i class="bi bi-power"></i> Desativar
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Reativar" asp-route-id="@conta.Id" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-arrow-clockwise"></i> Reativar
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
