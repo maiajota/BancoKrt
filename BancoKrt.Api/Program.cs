@@ -1,6 +1,5 @@
 using BancoKrt.Application.Services;
 using BancoKrt.Domain.Interfaces;
-using BancoKrt.Infrastructure.Caching;
 using BancoKrt.Infrastructure.Data;
 using BancoKrt.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;

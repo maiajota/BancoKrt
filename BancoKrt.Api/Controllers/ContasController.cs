@@ -41,9 +41,9 @@ public class ContasController(ContaAppService service) : ControllerBase
     public async Task<ActionResult<ContaDto>> ObterPorId(Guid id)
     {
         var conta = await _service.ObterPorIdAsync(id);
-        
+
         if (conta == null) return NotFound();
-        
+
         return Ok(conta);
     }
 
@@ -59,15 +59,15 @@ public class ContasController(ContaAppService service) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Atualizar(Guid id, [FromBody] AtualizarContaRequest request)
     {
-        var contaAtualizada = await _service.AtualizarAsync(id, request.Nome, request.IsAtivo);
-        
+        var contaAtualizada = await _service.AtualizarAsync(id, request.Nome);
+
         if (contaAtualizada == null) return NotFound();
-        
+
         return NoContent();
     }
 
     /// <summary>
-    /// Remove uma conta do sistema.
+    /// Realiza o soft delete de uma conta.
     /// </summary>
     /// <param name="id">ID da conta a ser deletada.</param>
     /// <response code="204">Conta removida com sucesso.</response>
@@ -78,10 +78,28 @@ public class ContasController(ContaAppService service) : ControllerBase
         await _service.DeletarAsync(id);
         return NoContent();
     }
+
+    /// <summary>
+    /// Reativa uma conta que foi desativada.
+    /// </summary>
+    /// <param name="id">ID da conta.</param>
+    /// <response code="204">Conta reativada com sucesso.</response>
+    /// <response code="404">Conta não encontrada.</response>
+    [HttpPatch("{id}/reativar")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Reativar(Guid id)
+    {
+        var sucesso = await _service.ReativarAsync(id);
+
+        if (!sucesso) return NotFound();
+
+        return NoContent();
+    }
 }
 
 /// <summary> Objeto para criação de conta </summary>
 public record CriarContaRequest(string Nome, string Cpf);
 
 /// <summary> Objeto para atualização de conta </summary>
-public record AtualizarContaRequest(string Nome, bool IsAtivo);
+public record AtualizarContaRequest(string Nome);

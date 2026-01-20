@@ -33,9 +33,9 @@ public class ContaAppService(IContaRepository repository, ILogger<ContaAppServic
     public async Task<ContaDto?> ObterPorIdAsync(Guid id)
     {
         _logger.LogInformation("Consultando dados da conta: {Id}", id);
-        
+
         var conta = await _repository.ObterPorIdAsync(id);
-        
+
         if (conta == null)
         {
             _logger.LogWarning("Conta {Id} não encontrada no banco.", id);
@@ -45,14 +45,14 @@ public class ContaAppService(IContaRepository repository, ILogger<ContaAppServic
         return new ContaDto(conta.Id, conta.Nome, conta.Cpf, conta.IsAtivo);
     }
 
-    public async Task<ContaDto?> AtualizarAsync(Guid id, string nome, bool isAtivo)
+    public async Task<ContaDto?> AtualizarAsync(Guid id, string nome)
     {
-        _logger.LogInformation("Atualizando conta {Id}. Novo Nome: {Nome}, Ativo: {Status}", id, nome, isAtivo);
-        
+        _logger.LogInformation("Atualizando conta {Id}. Novo Nome: {Nome}", id, nome);
+
         var conta = await _repository.ObterPorIdAsync(id);
         if (conta == null) return null;
 
-        conta.Atualizar(nome, isAtivo);
+        conta.Atualizar(nome);
         await _repository.AtualizarAsync(conta);
 
         _logger.LogInformation("Conta {Id} atualizada com sucesso.", id);
@@ -61,8 +61,41 @@ public class ContaAppService(IContaRepository repository, ILogger<ContaAppServic
 
     public async Task DeletarAsync(Guid id)
     {
-        _logger.LogInformation("Solicitação da removação da conta {Id}", id);
-        await _repository.DeletarAsync(id);
-        _logger.LogInformation("Conta {Id} removida do sistema.", id);
+        _logger.LogInformation("Solicitação da remoção da conta {Id}", id);
+
+        var conta = await _repository.ObterPorIdAsync(id);
+        if (conta != null)
+        {
+            conta.Desativar();
+            await _repository.AtualizarAsync(conta);
+
+            _logger.LogInformation("Conta {Id} removida do sistema.", id);
+
+        }
+    }
+
+    public async Task<bool> ReativarAsync(Guid id)
+    {
+        _logger.LogInformation("Solicitação de reativação da conta {Id}", id);
+
+        var conta = await _repository.ObterPorIdAsync(id);
+
+        if (conta == null)
+        {
+            _logger.LogWarning("Falha ao reativar: Conta {Id} não encontrada.", id);
+            return false;
+        }
+
+        if (conta.IsAtivo)
+        {
+            _logger.LogInformation("Conta {Id} já se encontra ativa.", id);
+            return true;
+        }
+
+        conta.Reativar();
+        await _repository.AtualizarAsync(conta);
+
+        _logger.LogInformation("Conta {Id} reativada com sucesso.", id);
+        return true;
     }
 }

@@ -7,9 +7,18 @@ public class Conta(string nome, string cpf)
     public string Cpf { get; private set; } = cpf;
     public bool IsAtivo { get; private set; } = true;
 
-    public void Atualizar(string nome, bool status)
+    public void Atualizar(string nome)
     {
         Nome = nome;
-        IsAtivo = status;
+    }
+
+    public void Desativar()
+    {
+        IsAtivo = false;
+    }
+
+    public void Reativar()
+    {
+        IsAtivo = true;
     }
 }

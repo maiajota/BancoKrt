@@ -2,7 +2,7 @@ using BancoKrt.Domain.Entities;
 using BancoKrt.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace BancoKrt.Infrastructure.Caching;
+namespace BancoKrt.Infrastructure.Repositories;
 
 public class CachedContaRepository(IContaRepository inner, IMemoryCache cache) : IContaRepository
 {
@@ -11,30 +11,24 @@ public class CachedContaRepository(IContaRepository inner, IMemoryCache cache) :
 
     public async Task<Conta?> ObterPorIdAsync(Guid id)
     {
-        string chaveCache = $"conta-{id}";
+        string key = $"conta-{id}";
 
-        if (!_cache.TryGetValue(chaveCache, out Conta? conta))
+        return await _cache.GetOrCreateAsync(key, entry =>
         {
-            conta = await _inner.ObterPorIdAsync(id);
-
-            if (conta != null)
-                _cache.Set(chaveCache, conta, TimeSpan.FromHours(24)); 
-        }
-
-        return conta;
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
+            return _inner.ObterPorIdAsync(id);
+        });
     }
 
-    public async Task AdicionarAsync(Conta conta) => await _inner.AdicionarAsync(conta);
+    public async Task AdicionarAsync(Conta conta)
+    {
+        await _inner.AdicionarAsync(conta);
+    }
 
     public async Task AtualizarAsync(Conta conta)
     {
         _cache.Remove($"conta-{conta.Id}");
-        await _inner.AtualizarAsync(conta);
-    }
 
-    public async Task DeletarAsync(Guid id)
-    {
-        _cache.Remove($"conta-{id}");
-        await _inner.DeletarAsync(id);
+        await _inner.AtualizarAsync(conta);
     }
 }

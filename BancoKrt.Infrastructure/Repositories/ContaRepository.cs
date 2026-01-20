@@ -27,15 +27,4 @@ public class ContaRepository(AppDbContext context) : IContaRepository
         _context.Contas.Update(conta);
         await _context.SaveChangesAsync();
     }
-
-    public async Task DeletarAsync(Guid id)
-    {
-        var conta = await _context.Contas.FindAsync(id);
-
-        if (conta != null)
-        {
-            _context.Contas.Remove(conta);
-            await _context.SaveChangesAsync();
-        }
-    }
 }

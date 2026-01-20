@@ -7,5 +7,4 @@ public interface IContaRepository
     Task<Conta?> ObterPorIdAsync(Guid id);
     Task AdicionarAsync(Conta conta);
     Task AtualizarAsync(Conta conta);
-    Task DeletarAsync(Guid id);
 }
